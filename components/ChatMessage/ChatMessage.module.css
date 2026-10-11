@@ -1,0 +1,58 @@
+.message {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.user {
+  align-self: flex-end;
+  max-width: min(88%, 54ch);
+  padding: 14px 17px;
+  border-radius: 8px 8px 2px 8px;
+  background: var(--ultramarino);
+  color: #fff;
+}
+
+.assistant {
+  align-self: flex-start;
+  max-width: 68ch;
+  padding: 0 0 2px;
+  color: var(--tinta);
+}
+
+.speaker {
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.assistant .speaker {
+  color: var(--ultramarino);
+}
+
+.content {
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  margin-top: 12px;
+  color: rgba(21, 26, 34, 0.58);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 500px) {
+  .user {
+    max-width: 94%;
+    padding: 12px 14px;
+  }
+
+  .content {
+    font-size: 14px;
+  }
+}
