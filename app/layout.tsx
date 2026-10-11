@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Habla con la Máquina",
-  description: "Un espacio de prueba para conversar con una IA.",
+  description: "Prototipo de chat con Groq para conversar y consultar el uso de tokens.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
