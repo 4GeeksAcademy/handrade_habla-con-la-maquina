@@ -1,0 +1,3 @@
+# Decisiones técnicas
+
+- 
