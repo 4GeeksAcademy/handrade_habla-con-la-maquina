@@ -1,0 +1,148 @@
+.markdownContent {
+  width: min(100%, 68ch);
+  color: var(--tinta);
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.markdownContent > :first-child {
+  margin-top: 0;
+}
+
+.markdownContent > :last-child {
+  margin-bottom: 0;
+}
+
+.markdownContent p {
+  margin: 0 0 1em;
+}
+
+.markdownContent h1,
+.markdownContent h2,
+.markdownContent h3 {
+  margin: 1.1em 0 0.45em;
+  color: var(--tinta);
+  font-family: var(--font-geist-sans), sans-serif;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.markdownContent h1 {
+  font-size: 18px;
+}
+
+.markdownContent h2 {
+  font-size: 16px;
+}
+
+.markdownContent h3 {
+  font-size: 15px;
+}
+
+.markdownContent ul,
+.markdownContent ol {
+  display: grid;
+  gap: 0.4em;
+  margin: 0 0 1em;
+  padding-left: 1.6em;
+}
+
+.markdownContent ul {
+  list-style: disc;
+}
+
+.markdownContent ol {
+  list-style: decimal;
+}
+
+.markdownContent li {
+  padding-left: 0.15em;
+}
+
+.markdownContent li > p {
+  margin: 0;
+}
+
+.markdownContent a {
+  color: var(--ultramarino);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.markdownContent :not(pre) > code {
+  padding: 0.12em 0.38em;
+  border-radius: 4px;
+  background: var(--niebla);
+  color: var(--tinta);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.88em;
+  overflow-wrap: anywhere;
+}
+
+.markdownContent pre {
+  max-width: 100%;
+  margin: 0 0 1em;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: var(--niebla);
+  color: var(--tinta);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.markdownContent pre code {
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  overflow-wrap: normal;
+}
+
+.tableWrap {
+  max-width: 100%;
+  margin: 0 0 1em;
+  overflow-x: auto;
+}
+
+.tableWrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.tableWrap th,
+.tableWrap td {
+  min-width: 100px;
+  padding: 8px 11px;
+  border: 1px solid var(--niebla);
+}
+
+.tableWrap th {
+  background: var(--niebla);
+  font-weight: 650;
+}
+
+.markdownContent blockquote {
+  margin: 0 0 1em;
+  padding: 0.2em 0 0.2em 1em;
+  border-left: 3px solid var(--niebla);
+  color: color-mix(in srgb, var(--tinta) 76%, transparent);
+}
+
+.markdownContent blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.markdownContent hr {
+  height: 1px;
+  margin: 1.5em 0;
+  border: 0;
+  background: var(--niebla);
+}

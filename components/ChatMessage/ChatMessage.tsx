@@ -1,4 +1,5 @@
 import type { Message } from "@/lib/groq";
+import MarkdownContent from "@/components/MarkdownContent/MarkdownContent";
 import styles from "./ChatMessage.module.css";
 
 interface ChatMessageProps {
@@ -20,11 +21,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       ) : (
         <>
           <span className={styles.srOnly}>La Máquina: </span>
-          <div className={styles.assistantContent}>
-            {message.content.split("\n\n").map((paragraph, index) => (
-              <p key={`${index}-${paragraph.slice(0, 12)}`}>{paragraph}</p>
-            ))}
-          </div>
+          <MarkdownContent content={message.content} />
           {message.usage && message.metrics && (
             <dl className={styles.metrics}>
               <div>

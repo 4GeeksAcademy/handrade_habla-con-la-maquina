@@ -1,6 +1,6 @@
 # Instrucciones del proyecto
 
-- Llama a Groq únicamente con `fetch`; no uses SDK de terceros ni Axios.
+- Llama a Groq únicamente con `fetch`; no uses SDK de terceros ni Axios. Se permiten `react-markdown` y `remark-gfm` exclusivamente para renderizar Markdown.
 - Usa el endpoint `https://api.groq.com/openai/v1/chat/completions`.
 - Incluye en cada petición las cabeceras `Authorization: Bearer <clave>` y `Content-Type: application/json`.
 - Envía siempre el historial completo de mensajes en cada llamada.

@@ -19,19 +19,6 @@
   white-space: pre-wrap;
 }
 
-.assistantContent {
-  display: grid;
-  gap: 12px;
-  color: var(--tinta);
-  font-size: 15px;
-  line-height: 1.75;
-  text-wrap: pretty;
-}
-
-.assistantContent p {
-  overflow-wrap: anywhere;
-}
-
 .metrics {
   display: flex;
   flex-wrap: wrap;
