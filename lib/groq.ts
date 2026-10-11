@@ -33,6 +33,7 @@ export class GroqError extends Error {
   constructor(
     message: string,
     public readonly status: number | null,
+    public readonly detail: string | null = null,
   ) {
     super(message);
     this.name = "GroqError";
@@ -40,12 +41,20 @@ export class GroqError extends Error {
 }
 
 export function friendlyError(status: number | null): string {
+  if (status === 400) {
+    return "La solicitud no es válida. Revisa el modelo configurado.";
+  }
+
   if (status === null) {
     return "No se pudo conectar con Groq. Comprueba tu conexión e inténtalo de nuevo.";
   }
 
   if (status === 401) {
     return "La clave de API de Groq no es válida. Revísala e inténtalo de nuevo.";
+  }
+
+  if (status === 404) {
+    return "No se encontró el modelo configurado. Revisa NEXT_PUBLIC_GROQ_MODEL.";
   }
 
   if (status === 429) {
@@ -57,6 +66,23 @@ export function friendlyError(status: number | null): string {
   }
 
   return "Groq no pudo completar la solicitud. Revisa la configuración e inténtalo de nuevo.";
+}
+
+function getApiErrorDetail(body: unknown): string | null {
+  if (typeof body !== "object" || body === null) {
+    return null;
+  }
+
+  const responseBody = body as Record<string, unknown>;
+  const apiError = responseBody.error;
+  if (typeof apiError === "object" && apiError !== null) {
+    const message = (apiError as Record<string, unknown>).message;
+    if (typeof message === "string") {
+      return message;
+    }
+  }
+
+  return typeof responseBody.message === "string" ? responseBody.message : null;
 }
 
 export async function callGroq(messages: Message[]): Promise<GroqResult> {
@@ -81,7 +107,18 @@ export async function callGroq(messages: Message[]): Promise<GroqResult> {
   }
 
   if (!response.ok) {
-    throw new GroqError(friendlyError(response.status), response.status);
+    let detail: string | null = null;
+    try {
+      detail = getApiErrorDetail(await response.json());
+    } catch {
+      // La respuesta de error puede no contener JSON válido.
+    }
+
+    if (detail !== null) {
+      console.error("Detalle del error de Groq:", detail);
+    }
+
+    throw new GroqError(friendlyError(response.status), response.status, detail);
   }
 
   let data: GroqResponse;
