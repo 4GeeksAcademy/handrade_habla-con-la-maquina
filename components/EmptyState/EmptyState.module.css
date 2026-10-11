@@ -1,57 +1,78 @@
 .emptyState {
   width: 100%;
   display: grid;
-  justify-items: start;
-  gap: 12px;
-  padding: 26px 0;
-}
-
-.kicker {
-  color: var(--ultramarino);
-  font-size: 10px;
-  font-weight: 800;
+  align-content: center;
+  gap: 14px;
+  flex: 1;
+  padding: 48px 0;
 }
 
 .emptyState h2 {
   color: var(--tinta);
   font-family: var(--font-bricolage);
-  font-size: 30px;
+  font-size: 36px;
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.12;
+  text-wrap: balance;
 }
 
-.emptyState > p {
-  color: rgba(21, 26, 34, 0.7);
+.emptyState h2 span {
+  color: #596170;
+}
+
+.intro {
+  max-width: 58ch;
+  color: #596170;
   font-size: 14px;
+  line-height: 1.7;
 }
 
-.prompts {
+.suggestions {
   width: 100%;
   display: grid;
-  gap: 8px;
-  margin-top: 9px;
+  gap: 9px;
+  margin-top: 14px;
+  list-style: none;
 }
 
-.prompts button {
+.suggestions button {
   width: 100%;
-  min-height: 46px;
-  padding: 10px 13px;
-  border: 1px solid rgba(21, 26, 34, 0.16);
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.66);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 15px;
+  border: 1px solid var(--niebla);
+  border-radius: 10px;
+  background: #fff;
   color: var(--tinta);
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1.45;
   text-align: left;
   cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
 }
 
-.prompts button:hover {
-  border-color: var(--ultramarino);
+.suggestions button:hover {
+  border-color: rgba(42, 58, 245, 0.5);
   background: #fff;
 }
 
-@media (max-width: 500px) {
+.arrow {
+  flex: 0 0 auto;
+  color: #596170;
+  font-size: 17px;
+  transition: color 140ms ease, transform 140ms ease;
+}
+
+.suggestions button:hover .arrow {
+  color: var(--ultramarino);
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 600px) {
   .emptyState h2 {
-    font-size: 26px;
+    font-size: 31px;
   }
 }

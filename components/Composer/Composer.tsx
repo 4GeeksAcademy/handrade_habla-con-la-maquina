@@ -4,41 +4,59 @@ import { useState, type FormEvent } from "react";
 import styles from "./Composer.module.css";
 
 interface ComposerProps {
-  onSubmit: (content: string) => void;
+  disabled: boolean;
+  onSend: (content: string) => void;
 }
 
-export default function Composer({ onSubmit }: ComposerProps) {
-  const [draft, setDraft] = useState("");
+export default function Composer({ disabled, onSend }: ComposerProps) {
+  const [value, setValue] = useState("");
+  const estimatedTokens = value.trim() ? Math.max(1, Math.round(value.trim().length / 4)) : 0;
+  const canSend = !disabled && value.trim().length > 0;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const content = draft.trim();
+    const content = value.trim();
 
-    if (!content) {
+    if (!canSend || !content) {
       return;
     }
 
-    onSubmit(content);
-    setDraft("");
+    onSend(content);
+    setValue("");
   }
 
   return (
-    <form className={styles.composer} onSubmit={handleSubmit}>
-      <label className={styles.label} htmlFor="message-composer">
-        Tu mensaje
+    <form className={styles.composer} onSubmit={submit}>
+      <label className={styles.srOnly} htmlFor="mensaje">
+        Escribe tu mensaje
       </label>
       <textarea
-        id="message-composer"
+        id="mensaje"
         className={styles.input}
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-        placeholder="Escribe lo que tienes en mente..."
         rows={2}
+        value={value}
+        disabled={disabled}
+        onChange={(event) => setValue(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.nativeEvent.isComposing) {
+            return;
+          }
+
+          if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            event.currentTarget.form?.requestSubmit();
+          }
+        }}
+        aria-describedby="composer-hint"
+        placeholder="Escribe a la Máquina…"
       />
       <div className={styles.controls}>
-        <span className={styles.hint}>Los mensajes se quedan en esta sesión de ejemplo.</span>
-        <button className={styles.sendButton} type="submit" disabled={!draft.trim()}>
-          Enviar
+        <p className={styles.hint} id="composer-hint">
+          <span className={styles.tokenEstimate}>~{estimatedTokens.toLocaleString("es-ES")}</span>{" "}
+          tokens estimados <span className={styles.shortcut}>· Mayús + Intro para salto de línea</span>
+        </p>
+        <button className={styles.sendButton} type="submit" disabled={!canSend} aria-label="Enviar mensaje">
+          <span aria-hidden="true">↑</span>
         </button>
       </div>
     </form>

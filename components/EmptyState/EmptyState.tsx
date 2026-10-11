@@ -1,23 +1,31 @@
 import styles from "./EmptyState.module.css";
 
 interface EmptyStateProps {
-  prompts: string[];
-  onSelectPrompt: (prompt: string) => void;
+  suggestions: string[];
+  onPick: (text: string) => void;
 }
 
-export default function EmptyState({ prompts, onSelectPrompt }: EmptyStateProps) {
+export default function EmptyState({ suggestions, onPick }: EmptyStateProps) {
   return (
     <section className={styles.emptyState} aria-labelledby="empty-state-title">
-      <span className={styles.kicker}>UNA PÁGINA EN BLANCO</span>
-      <h2 id="empty-state-title">¿Por dónde empezamos?</h2>
-      <p>Elige una idea para abrir la conversación.</p>
-      <div className={styles.prompts}>
-        {prompts.map((prompt) => (
-          <button key={prompt} type="button" onClick={() => onSelectPrompt(prompt)}>
-            {prompt}
-          </button>
+      <h2 id="empty-state-title">
+        Pregunta lo que quieras.
+        <br />
+        <span>Mira lo que cuesta.</span>
+      </h2>
+      <p className={styles.intro}>
+        Cada respuesta muestra los tokens que ha leído y escrito el modelo. Empieza con una de estas preguntas:
+      </p>
+      <ul className={styles.suggestions}>
+        {suggestions.map((suggestion) => (
+          <li key={suggestion}>
+            <button type="button" onClick={() => onPick(suggestion)}>
+              <span>{suggestion}</span>
+              <span className={styles.arrow} aria-hidden="true">↗</span>
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

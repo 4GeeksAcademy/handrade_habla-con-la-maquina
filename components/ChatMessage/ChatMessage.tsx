@@ -9,17 +9,43 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
 
   return (
-    <article className={`${styles.message} ${isUser ? styles.user : styles.assistant}`}>
-      <p className={styles.speaker}>{isUser ? "Tú" : "Habla con la Máquina"}</p>
-      <p className={styles.content}>{message.content}</p>
-
-      {!isUser && message.usage && message.metrics && (
-        <p className={styles.metrics}>
-          <span>{message.usage.prompt_tokens} entrada</span>
-          <span>{message.usage.completion_tokens} salida</span>
-          <span>{message.metrics.latencyMs.toFixed(0)} ms</span>
-          <span>{message.metrics.tokensPerSecond.toFixed(1)} tok/s</span>
-        </p>
+    <article className={styles.message}>
+      {isUser ? (
+        <div className={styles.userRow}>
+          <div className={styles.userBubble}>
+            <span className={styles.srOnly}>Tú: </span>
+            <p>{message.content}</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <span className={styles.srOnly}>La Máquina: </span>
+          <div className={styles.assistantContent}>
+            {message.content.split("\n\n").map((paragraph, index) => (
+              <p key={`${index}-${paragraph.slice(0, 12)}`}>{paragraph}</p>
+            ))}
+          </div>
+          {message.usage && message.metrics && (
+            <dl className={styles.metrics}>
+              <div>
+                <dt>prompt</dt>
+                <dd>{message.usage.prompt_tokens.toLocaleString("es-ES")}</dd>
+              </div>
+              <div>
+                <dt>respuesta</dt>
+                <dd>{message.usage.completion_tokens.toLocaleString("es-ES")}</dd>
+              </div>
+              <div>
+                <dt>ms</dt>
+                <dd>{Math.round(message.metrics.latencyMs).toLocaleString("es-ES")}</dd>
+              </div>
+              <div>
+                <dt>tok/s</dt>
+                <dd>{message.metrics.tokensPerSecond.toLocaleString("es-ES", { maximumFractionDigits: 1 })}</dd>
+              </div>
+            </dl>
+          )}
+        </>
       )}
     </article>
   );

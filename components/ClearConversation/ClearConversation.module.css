@@ -1,0 +1,64 @@
+.trigger,
+.cancel,
+.confirm {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.trigger,
+.cancel {
+  border: 1px solid var(--niebla);
+  background: transparent;
+  color: var(--tinta);
+}
+
+.trigger:hover:not(:disabled),
+.cancel:hover {
+  background: #fff;
+  border-color: var(--tinta);
+}
+
+.trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirmation {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.question {
+  margin-right: 4px;
+  color: rgba(21, 26, 34, 0.72);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.confirm {
+  border: 1px solid var(--error);
+  background: var(--error);
+  color: #fff;
+}
+
+.confirm:hover {
+  background: #a93226;
+}
+
+@media (max-width: 520px) {
+  .confirmation {
+    flex-wrap: wrap;
+  }
+
+  .question {
+    width: 100%;
+    margin: 0;
+    text-align: right;
+  }
+}

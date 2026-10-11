@@ -1,78 +1,123 @@
 "use client";
 
-import { useState } from "react";
-import type { Usage } from "@/lib/groq";
+import { useId, useState } from "react";
 import styles from "./MeterPanel.module.css";
 
-interface MeterPanelProps {
-  usage: Usage;
-  model: string;
-  latencyMs: number;
-  tokensPerSecond: number;
+export interface SessionStats {
+  promptTokens: number;
+  completionTokens: number;
+  turns: number;
+  avgLatencyMs: number | null;
+  avgTokensPerSecond: number | null;
 }
 
-export default function MeterPanel({
-  usage,
-  model,
-  latencyMs,
-  tokensPerSecond,
-}: MeterPanelProps) {
+interface MeterPanelProps {
+  stats: SessionStats;
+  model: string;
+  simulateError: boolean;
+  onToggleError: (value: boolean) => void;
+}
+
+const formatInteger = (value: number) => Math.round(value).toLocaleString("es-ES");
+const formatDecimal = (value: number) =>
+  value.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+function StatsBody({ stats, model, simulateError, onToggleError }: MeterPanelProps) {
+  const total = stats.promptTokens + stats.completionTokens;
+  const promptShare = total > 0 ? (stats.promptTokens / total) * 100 : 0;
+  const responseShare = total > 0 ? 100 - promptShare : 0;
+
+  return (
+    <div className={styles.statsBody}>
+      <div className={styles.primaryStats}>
+        <dl className={styles.total}>
+          <dt>Total de la sesión</dt>
+          <dd>{formatInteger(total)}</dd>
+          <dd>{`tokens en ${stats.turns} ${stats.turns === 1 ? "respuesta" : "respuestas"}`}</dd>
+        </dl>
+
+        <div
+          className={styles.tokenBar}
+          role="img"
+          aria-label={`Prompt ${Math.round(promptShare)} %, respuesta ${Math.round(responseShare)} %`}
+        >
+          <span className={styles.promptFill} style={{ width: `${promptShare}%` }} />
+          <span className={styles.responseFill} style={{ width: `${responseShare}%` }} />
+        </div>
+
+        <dl className={styles.tokenBreakdown}>
+          <div>
+            <dt><span className={styles.promptDot} aria-hidden="true" />Prompt</dt>
+            <dd>{formatInteger(stats.promptTokens)}</dd>
+          </div>
+          <div>
+            <dt><span className={styles.responseDot} aria-hidden="true" />Respuesta</dt>
+            <dd>{formatInteger(stats.completionTokens)}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <dl className={styles.details}>
+        <div>
+          <dt>Modelo</dt>
+          <dd className={styles.modelName}>{model}</dd>
+        </div>
+        <div>
+          <dt>Latencia media</dt>
+          <dd>{stats.avgLatencyMs === null ? "—" : `${formatInteger(stats.avgLatencyMs)} ms`}</dd>
+        </div>
+        <div>
+          <dt>Velocidad media</dt>
+          <dd>
+            {stats.avgTokensPerSecond === null
+              ? "—"
+              : `${formatDecimal(stats.avgTokensPerSecond)} tok/s`}
+          </dd>
+        </div>
+      </dl>
+
+      <div className={styles.simulator}>
+        <label htmlFor="simular-error">Prototipo: simular error en el próximo envío</label>
+        <input
+          id="simular-error"
+          type="checkbox"
+          checked={simulateError}
+          onChange={(event) => onToggleError(event.target.checked)}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default function MeterPanel(props: MeterPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const panelId = useId();
+  const total = props.stats.promptTokens + props.stats.completionTokens;
 
   return (
     <section className={styles.panel} aria-label="Medidor de sesión">
+      <h2 className={styles.desktopTitle}>Medidor de sesión</h2>
       <button
-        className={styles.summary}
+        className={styles.mobileToggle}
         type="button"
         aria-expanded={isOpen}
-        aria-controls="session-meter-content"
+        aria-controls={panelId}
         onClick={() => setIsOpen((currentValue) => !currentValue)}
       >
-        <span className={styles.summaryTitle}>Medidor de sesión</span>
-        <strong className={styles.summaryTotal}>{usage.total_tokens.toLocaleString("es-ES")}</strong>
-        <span className={styles.summaryAction}>{isOpen ? "Cerrar" : "Ver métricas"}</span>
+        <span>Medidor de sesión</span>
+        <span className={styles.mobileTotal}>
+          <strong>{formatInteger(total)}</strong>
+          <span>tokens</span>
+          <span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`} aria-hidden="true">
+            ⌄
+          </span>
+        </span>
       </button>
-
       <div
-        className={`${styles.content} ${isOpen ? styles.contentOpen : ""}`}
-        id="session-meter-content"
+        id={panelId}
+        className={`${styles.panelContent} ${isOpen ? styles.panelContentOpen : ""}`}
       >
-        <div className={styles.panelHeading}>
-          <div>
-            <p className={styles.eyebrow}>MÉTRICAS DE USO</p>
-            <h2>Medidor de sesión</h2>
-          </div>
-          <span className={styles.sampleMark}>MUESTRA</span>
-        </div>
-
-        <div className={styles.totalBlock}>
-          <span className={styles.totalLabel}>Tokens totales</span>
-          <strong className={styles.totalValue}>{usage.total_tokens.toLocaleString("es-ES")}</strong>
-        </div>
-
-        <dl className={styles.stats}>
-          <div>
-            <dt>Entrada</dt>
-            <dd>{usage.prompt_tokens.toLocaleString("es-ES")}</dd>
-          </div>
-          <div>
-            <dt>Salida</dt>
-            <dd>{usage.completion_tokens.toLocaleString("es-ES")}</dd>
-          </div>
-          <div>
-            <dt>Latencia acumulada</dt>
-            <dd>{latencyMs.toLocaleString("es-ES")} ms</dd>
-          </div>
-          <div>
-            <dt>Velocidad media</dt>
-            <dd>{tokensPerSecond.toFixed(1)} tok/s</dd>
-          </div>
-        </dl>
-
-        <div className={styles.modelBlock}>
-          <span className={styles.modelLabel}>MODELO</span>
-          <span className={styles.modelName}>{model}</span>
-        </div>
+        <StatsBody {...props} />
       </div>
     </section>
   );
