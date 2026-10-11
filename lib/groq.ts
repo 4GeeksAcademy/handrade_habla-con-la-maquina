@@ -7,6 +7,7 @@ export interface Usage {
 export interface MessageMetrics {
   latencyMs: number;
   tokensPerSecond: number;
+  model: string;
 }
 
 export interface Message {

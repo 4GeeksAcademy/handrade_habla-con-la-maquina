@@ -1,10 +1,11 @@
 import styles from "./ErrorBanner.module.css";
 
 interface ErrorBannerProps {
+  message: string;
   onRetry: () => void;
 }
 
-export default function ErrorBanner({ onRetry }: ErrorBannerProps) {
+export default function ErrorBanner({ message, onRetry }: ErrorBannerProps) {
   return (
     <div className={styles.banner} role="alert">
       <div className={styles.message}>
@@ -12,7 +13,7 @@ export default function ErrorBanner({ onRetry }: ErrorBannerProps) {
           !
         </span>
         <p>
-          <strong>No se pudo obtener respuesta.</strong> El modelo tardó demasiado. No se han consumido tokens.
+          <strong>No se pudo obtener respuesta.</strong> {message}
         </p>
       </div>
       <button className={styles.retry} type="button" onClick={onRetry}>

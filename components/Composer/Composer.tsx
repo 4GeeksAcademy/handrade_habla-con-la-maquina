@@ -1,28 +1,24 @@
-"use client";
-
-import { useState, type FormEvent } from "react";
+import type { FormEvent } from "react";
 import styles from "./Composer.module.css";
 
 interface ComposerProps {
+  value: string;
+  onChange: (value: string) => void;
   disabled: boolean;
-  onSend: (content: string) => void;
+  onSend: () => void;
 }
 
-export default function Composer({ disabled, onSend }: ComposerProps) {
-  const [value, setValue] = useState("");
-  const estimatedTokens = value.trim() ? Math.max(1, Math.round(value.trim().length / 4)) : 0;
+export default function Composer({ value, onChange, disabled, onSend }: ComposerProps) {
   const canSend = !disabled && value.trim().length > 0;
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const content = value.trim();
 
-    if (!canSend || !content) {
+    if (!canSend) {
       return;
     }
 
-    onSend(content);
-    setValue("");
+    onSend();
   }
 
   return (
@@ -36,7 +32,7 @@ export default function Composer({ disabled, onSend }: ComposerProps) {
         rows={2}
         value={value}
         disabled={disabled}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing) {
             return;
@@ -47,14 +43,9 @@ export default function Composer({ disabled, onSend }: ComposerProps) {
             event.currentTarget.form?.requestSubmit();
           }
         }}
-        aria-describedby="composer-hint"
         placeholder="Escribe a la Máquina…"
       />
       <div className={styles.controls}>
-        <p className={styles.hint} id="composer-hint">
-          <span className={styles.tokenEstimate}>~{estimatedTokens.toLocaleString("es-ES")}</span>{" "}
-          tokens estimados <span className={styles.shortcut}>· Mayús + Intro para salto de línea</span>
-        </p>
         <button className={styles.sendButton} type="submit" disabled={!canSend} aria-label="Enviar mensaje">
           <span aria-hidden="true">↑</span>
         </button>

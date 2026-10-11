@@ -6,24 +6,23 @@ import styles from "./MeterPanel.module.css";
 export interface SessionStats {
   promptTokens: number;
   completionTokens: number;
+  totalTokens: number;
   turns: number;
   avgLatencyMs: number | null;
   avgTokensPerSecond: number | null;
+  model: string | null;
 }
 
 interface MeterPanelProps {
   stats: SessionStats;
-  model: string;
-  simulateError: boolean;
-  onToggleError: (value: boolean) => void;
 }
 
 const formatInteger = (value: number) => Math.round(value).toLocaleString("es-ES");
 const formatDecimal = (value: number) =>
   value.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-function StatsBody({ stats, model, simulateError, onToggleError }: MeterPanelProps) {
-  const total = stats.promptTokens + stats.completionTokens;
+function StatsBody({ stats }: MeterPanelProps) {
+  const total = stats.totalTokens;
   const promptShare = total > 0 ? (stats.promptTokens / total) * 100 : 0;
   const responseShare = total > 0 ? 100 - promptShare : 0;
 
@@ -60,7 +59,7 @@ function StatsBody({ stats, model, simulateError, onToggleError }: MeterPanelPro
       <dl className={styles.details}>
         <div>
           <dt>Modelo</dt>
-          <dd className={styles.modelName}>{model}</dd>
+          <dd className={styles.modelName}>{stats.model ?? "—"}</dd>
         </div>
         <div>
           <dt>Latencia media</dt>
@@ -76,15 +75,6 @@ function StatsBody({ stats, model, simulateError, onToggleError }: MeterPanelPro
         </div>
       </dl>
 
-      <div className={styles.simulator}>
-        <label htmlFor="simular-error">Prototipo: simular error en el próximo envío</label>
-        <input
-          id="simular-error"
-          type="checkbox"
-          checked={simulateError}
-          onChange={(event) => onToggleError(event.target.checked)}
-        />
-      </div>
     </div>
   );
 }
@@ -92,7 +82,7 @@ function StatsBody({ stats, model, simulateError, onToggleError }: MeterPanelPro
 export default function MeterPanel(props: MeterPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const panelId = useId();
-  const total = props.stats.promptTokens + props.stats.completionTokens;
+  const total = props.stats.totalTokens;
 
   return (
     <section className={styles.panel} aria-label="Medidor de sesión">
@@ -117,7 +107,7 @@ export default function MeterPanel(props: MeterPanelProps) {
         id={panelId}
         className={`${styles.panelContent} ${isOpen ? styles.panelContentOpen : ""}`}
       >
-        <StatsBody {...props} />
+        <StatsBody stats={props.stats} />
       </div>
     </section>
   );

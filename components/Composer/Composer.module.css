@@ -46,22 +46,6 @@
   padding: 0 2px 0 8px;
 }
 
-.hint {
-  color: #596170;
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-.tokenEstimate {
-  color: rgba(21, 26, 34, 0.85);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.shortcut {
-  display: none;
-}
-
 .sendButton {
   width: 36px;
   height: 36px;
@@ -86,16 +70,6 @@
   background: #e8ebf0;
   color: #596170;
   cursor: not-allowed;
-}
-
-@media (min-width: 640px) {
-  .hint {
-    font-size: 12px;
-  }
-
-  .shortcut {
-    display: inline;
-  }
 }
 
 .srOnly {
