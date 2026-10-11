@@ -1,4 +1,10 @@
 :root {
+  --papel: #F3F5F8;
+  --tinta: #151A22;
+  --ultramarino: #2A3AF5;
+  --ambar: #F5A524;
+  --niebla: #DDE2EA;
+  --error: #C0392B;
   --background: #ffffff;
   --foreground: #171717;
 }
