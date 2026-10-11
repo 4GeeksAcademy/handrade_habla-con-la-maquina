@@ -11,18 +11,134 @@ import { callGroq, friendlyError, GroqError, type Message } from "@/lib/groq";
 import type { SessionStats } from "@/components/MeterPanel/MeterPanel";
 import styles from "./page.module.css";
 
+const conversationKey = "habla-maquina:conversacion";
+
 const suggestions = [
   "¿Qué es exactamente un token?",
   "Resume en tres puntos cómo funciona un modelo de lenguaje.",
   "¿Por qué una pregunta larga cuesta más que una corta?",
 ];
 
+function isStoredMessage(value: unknown): value is Message {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const message = value as Record<string, unknown>;
+  if (
+    !["system", "user", "assistant"].includes(String(message.role)) ||
+    typeof message.content !== "string"
+  ) {
+    return false;
+  }
+
+  if (message.usage !== undefined) {
+    if (typeof message.usage !== "object" || message.usage === null) {
+      return false;
+    }
+
+    const usage = message.usage as Record<string, unknown>;
+    if (
+      ![usage.prompt_tokens, usage.completion_tokens, usage.total_tokens].every(
+        (tokenCount) => typeof tokenCount === "number" && Number.isFinite(tokenCount),
+      )
+    ) {
+      return false;
+    }
+  }
+
+  if (message.metrics !== undefined) {
+    if (typeof message.metrics !== "object" || message.metrics === null) {
+      return false;
+    }
+
+    const metrics = message.metrics as Record<string, unknown>;
+    if (
+      typeof metrics.latencyMs !== "number" ||
+      !Number.isFinite(metrics.latencyMs) ||
+      typeof metrics.tokensPerSecond !== "number" ||
+      !Number.isFinite(metrics.tokensPerSecond) ||
+      typeof metrics.model !== "string"
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isStoredConversation(value: unknown): value is Message[] {
+  return Array.isArray(value) && value.every(isStoredMessage);
+}
+
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    // Diferimos la carga para evitar una actualización síncrona durante el montaje.
+    queueMicrotask(() => {
+      try {
+        const storedConversation = localStorage.getItem(conversationKey);
+        if (storedConversation === null) {
+          return;
+        }
+
+        const parsedConversation: unknown = JSON.parse(storedConversation);
+        if (!isStoredConversation(parsedConversation)) {
+          localStorage.removeItem(conversationKey);
+          return;
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        setMessages(parsedConversation);
+        const lastMessage = parsedConversation.at(-1);
+        if (lastMessage?.role === "user") {
+          setError("La última respuesta no llegó. Pulsa Reintentar");
+        }
+      } catch {
+        try {
+          localStorage.removeItem(conversationKey);
+        } catch {
+          // El navegador puede tener el almacenamiento desactivado.
+        }
+      } finally {
+        if (isMounted) {
+          setHasLoaded(true);
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoaded) {
+      return;
+    }
+
+    try {
+      if (messages.length === 0) {
+        localStorage.removeItem(conversationKey);
+        return;
+      }
+
+      localStorage.setItem(conversationKey, JSON.stringify(messages));
+    } catch {
+      // La conversación sigue funcionando aunque no se pueda guardar.
+    }
+  }, [messages, hasLoaded]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -124,6 +240,11 @@ export default function Home() {
     setMessages([]);
     setInput("");
     setError(null);
+    try {
+      localStorage.removeItem(conversationKey);
+    } catch {
+      // El estado visible se reinicia aunque el almacenamiento no esté disponible.
+    }
   }
 
   return (
@@ -142,7 +263,7 @@ export default function Home() {
 
         <div className={styles.transcriptViewport}>
           <div className={styles.transcriptInner}>
-            {messages.length === 0 ? (
+            {!hasLoaded ? null : messages.length === 0 ? (
               <EmptyState suggestions={suggestions} onPick={(text) => void handleSend(text)} />
             ) : (
               <ol className={styles.messageList} aria-label="Conversación" aria-live="polite">
